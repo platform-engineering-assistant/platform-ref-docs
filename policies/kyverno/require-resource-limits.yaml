@@ -1,0 +1,33 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-equal-resource-requests-limits
+  annotations:
+    policies.kyverno.io/minversion: "1.11.0"
+    platform-assistant.io/generation-hint: "When generating resources, set CPU and memory requests equal to limits."
+    platform-assistant.io/constraint: "equal-resource-requests-limits"
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: require-equal-cpu-memory
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        message: "CPU and memory requests and limits are required and must be equal."
+        cel:
+          expressions:
+            - expression: >-
+                object.spec.template.spec.containers.all(container,
+                has(container.resources) &&
+                has(container.resources.requests) &&
+                has(container.resources.requests.cpu) &&
+                has(container.resources.requests.memory) &&
+                has(container.resources.limits) &&
+                has(container.resources.limits.cpu) &&
+                has(container.resources.limits.memory) &&
+                container.resources.requests.cpu == container.resources.limits.cpu &&
+                container.resources.requests.memory == container.resources.limits.memory)
+              message: "Every container must set equal CPU and memory requests and limits."

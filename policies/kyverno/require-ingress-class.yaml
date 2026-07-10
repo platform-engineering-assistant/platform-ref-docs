@@ -1,0 +1,22 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-ingress-class
+  annotations:
+    platform-assistant.io/generation-hint: "Ingress configuration must set ingressClassName or Helm values ingress.className."
+    platform-assistant.io/constraint: "require-ingress-class"
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: require-ingress-class-name
+      match:
+        any:
+          - resources:
+              kinds:
+                - Ingress
+      validate:
+        message: "Ingress resources must define an ingress class."
+        pattern:
+          spec:
+            ingressClassName: "?*"
+

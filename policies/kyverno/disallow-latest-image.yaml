@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-image
+  annotations:
+    platform-assistant.io/generation-hint: "Do not generate image tags using latest."
+    platform-assistant.io/constraint: "disallow-latest-image"
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: require-explicit-image-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Deployment
+      validate:
+        message: "Images must use an explicit immutable tag instead of latest."
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - image: "!*:latest"
+
