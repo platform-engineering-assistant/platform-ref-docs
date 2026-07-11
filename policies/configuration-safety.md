@@ -10,7 +10,8 @@ This document describes safe behavior expected from the assistant when generatin
 - The assistant must not deploy changes automatically.
 - The assistant must show evidence paths used for a generated patch.
 - The assistant must state assumptions when host names, namespaces, or environment conventions are inferred.
-- The assistant must prefer modifying an existing service configuration over creating a new file when the correct file already exists.
+- Prefer modifying an existing Helm values file under `charts/<service>/values.yaml` when that chart exists.
+- Do not invent `config/<environment>/values.yaml` or a GitOps repository unless those paths/repos already exist in configuration and evidence.
 - Kyverno policies under `policies/kyverno/` should be retrieved as generation constraints when producing YAML changes.
 - A multi-file change set must be generated and checked before any target file is written.
 - The assistant must request explicit confirmation before writing generated files into a local repository.

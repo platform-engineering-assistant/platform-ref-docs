@@ -2,42 +2,24 @@
 
 ## Purpose
 
-This standard defines environment naming and file layout expectations.
+This standard defines environment naming for the local MVP.
 
-## Environments
+## Local MVP
 
-The prototype platform uses these environment names:
+The demonstration uses a single local cluster. Environment labels are optional for Helm chart changes.
 
-| Environment | Purpose |
-| --- | --- |
-| `dev` | development validation |
-| `tst` | test validation |
-| `staging` | pre-production validation |
-| `prod` | production workloads |
+When a hostname template includes `{environment}`, use `local` unless the user explicitly asks for another label.
 
 ## Service Repository Layout
 
-Environment-specific Helm values should use:
+Preferred layout (same-repo Helm chart):
 
 ```text
-config/<environment>/values.yaml
+charts/<service>/values.yaml
 ```
 
-## GitOps Repository Layout
-
-Argo CD application definitions should use:
-
-```text
-apps/<environment>/<service-name>.yaml
-```
-
-The `platform-gitops-devtst` repository contains only the lower environments:
-
-```text
-apps/dev/<service-name>.yaml
-apps/tst/<service-name>.yaml
-```
+Legacy multi-environment values files (`config/<environment>/values.yaml`) are not used by the local MVP.
 
 ## Assistant Retrieval Hints
 
-Requests containing an environment name should retrieve matching service and GitOps files before general examples.
+Requests containing `environment`, `dev`, `tst`, `staging`, `prod`, or `local` may retrieve this standard for naming guidance only.

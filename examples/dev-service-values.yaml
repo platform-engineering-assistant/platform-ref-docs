@@ -1,25 +1,10 @@
-image:
-  repository: example-service
-  tag: "1.0.0-dev"
+# Deprecated legacy example
 
-replicaCount: 1
+This file is retained only for historical comparison.
 
-service:
-  port: 8080
+For the local MVP, use:
 
-ingress:
-  enabled: true
-  className: apisix
-  hosts:
-    - host: example-service.dev.example.internal
-      paths:
-        - path: /
-          pathType: Prefix
+- `examples/helm-service-values.yaml`
+- `examples/helm-ingress-template.yaml`
 
-resources:
-  requests:
-    cpu: 100m
-    memory: 128Mi
-  limits:
-    cpu: 100m
-    memory: 128Mi
+Those examples target `charts/<service>/values.yaml` and `charts/<service>/templates/ingress.yaml`.

@@ -15,7 +15,11 @@ charts/<service-name>/
     service.yaml
 ```
 
-An ingress template may be added when ingress is requested.
+An ingress template may be added when ingress is requested:
+
+```text
+charts/<service-name>/templates/ingress.yaml
+```
 
 ## Required Values
 

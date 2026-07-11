@@ -1,0 +1,39 @@
+# Example Helm Service Values
+
+Complete reference values for a same-repository Helm chart.
+
+Path:
+
+```text
+charts/example-service/values.yaml
+```
+
+```yaml
+image: nginx:1.27-alpine
+replicaCount: 1
+containerPort: 80
+service:
+  type: ClusterIP
+  port: 80
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+ingress:
+  enabled: true
+  className: apisix
+  hosts:
+    - host: example-service.example.internal
+      paths:
+        - path: /
+          pathType: Prefix
+```
+
+## Notes
+
+- Use an explicit image tag or digest. Never use `latest`.
+- Keep CPU/memory requests and limits equal when the equal-resource policy is enforced.
+- Ingress belongs in chart values, not in a separate GitOps repository for the local MVP.

@@ -4,35 +4,48 @@ This repository contains platform knowledge used by the platform assistant.
 
 The knowledge base is organized by intent:
 
-- `standards/` contains required platform conventions.
-- `runbooks/` contains step-by-step migration or operational guidance.
-- `examples/` contains complete reference configurations.
+- `standards/` contains required platform conventions and assistant behavior guidance.
+- `runbooks/` contains step-by-step operational guidance for common requests.
+- `examples/` contains complete reference configurations for the same-repo Helm layout.
 - `policies/` describes policy expectations in human-readable form.
 - `policies/kyverno/` contains Kyverno policies that the assistant should retrieve as YAML generation constraints.
 
-The assistant indexes these documents together with service repositories and GitOps repositories. A service-team request should retrieve only the documents relevant to the requested application, environment, resource, and platform technology.
+The assistant indexes these documents together with configured service repositories. Search indexes are rebuildable. The live repository filesystem is authoritative for current state.
 
 ## Core Topics
 
-- Ingress configuration and APISIX migration
-- Service onboarding through GitOps
+- Intelligent conversation and clarification playbook
+- Same-repository Helm chart and Argo CD layout
+- Workload onboarding from Dockerfile or workload descriptor evidence
+- Ingress / APISIX configuration inside the service Helm chart
 - Resource request and limit defaults
 - Kyverno policy constraints for generated YAML
-- Environment naming conventions
-- Argo CD application layout
-- Lower-environment GitOps layout for `dev` and `tst`
-- Generic workload onboarding from an empty deployment configuration
-- Same-repository Helm and Argo CD layout
+- Configuration safety: local write only, no commit/push/deploy
+- Common request handling (`deploy`, `apisix`, `what can you do`, `where does this go`)
+
+## Local MVP Layout
+
+Preferred evidence-backed layout:
+
+```text
+charts/<service>/
+  Chart.yaml
+  values.yaml
+  templates/
+argocd/<service>.yaml
+```
+
+Do not invent a separate GitOps repository when only a service repository and docs repository are configured.
 
 ## Retrieval Expectations
 
 The assistant should prefer:
 
-1. a matching service repository configuration,
-2. a matching GitOps application definition,
-3. the relevant platform standard,
-4. an example only when the target service does not already have a matching file,
-5. a runbook when the request is about migration or change procedure.
+1. matching live service repository files,
+2. the relevant platform standard or playbook,
+3. Kyverno policy constraints,
+4. a runbook for procedural questions,
+5. an example only when the target service does not already have a matching file.
 
 When sources conflict, use this precedence:
 
@@ -42,4 +55,10 @@ When sources conflict, use this precedence:
 4. matching live repository conventions,
 5. generic examples.
 
-The live repository filesystem is authoritative for current state. Search indexes are rebuildable retrieval data and must not preserve deleted files as current evidence.
+## Re-index After Changes
+
+From `platform-assistant-agent`:
+
+```bash
+uv run platform-assist index --vector
+```
