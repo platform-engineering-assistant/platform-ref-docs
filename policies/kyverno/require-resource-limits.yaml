@@ -3,7 +3,6 @@ kind: ClusterPolicy
 metadata:
   name: require-equal-resource-requests-limits
   annotations:
-    policies.kyverno.io/minversion: "1.11.0"
     platform-assistant.io/generation-hint: "When generating resources, set CPU and memory requests equal to limits."
     platform-assistant.io/constraint: "equal-resource-requests-limits"
 spec:
@@ -14,20 +13,26 @@ spec:
         any:
           - resources:
               kinds:
-                - Deployment
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - argocd
+                - kyverno
       validate:
         message: "CPU and memory requests and limits are required and must be equal."
-        cel:
-          expressions:
-            - expression: >-
-                object.spec.template.spec.containers.all(container,
-                has(container.resources) &&
-                has(container.resources.requests) &&
-                has(container.resources.requests.cpu) &&
-                has(container.resources.requests.memory) &&
-                has(container.resources.limits) &&
-                has(container.resources.limits.cpu) &&
-                has(container.resources.limits.memory) &&
-                container.resources.requests.cpu == container.resources.limits.cpu &&
-                container.resources.requests.memory == container.resources.limits.memory)
-              message: "Every container must set equal CPU and memory requests and limits."
+        foreach:
+          - list: request.object.spec.containers
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.resources.requests.cpu || '' }}"
+                    operator: NotEquals
+                    value: "{{ element.resources.limits.cpu || 'missing-limit' }}"
+                  - key: "{{ element.resources.requests.memory || '' }}"
+                    operator: NotEquals
+                    value: "{{ element.resources.limits.memory || 'missing-limit' }}"
